@@ -33,7 +33,8 @@
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="Aircraft number:"/>
+		android:text="Aircraft number:"
+		android:id="@+id/tvAircraftNr"/>
 	<LinearLayout
 
 		android:layout_width="match_parent"
@@ -79,6 +80,6 @@
 		android:inputType="textPersonName"
 		android:text="Lap time was % seconds"
 		android:ems="10"
-		android:id="@+id/etTest"/>
+		android:id="@+id/etSpeech"/>
 
 </LinearLayout>
