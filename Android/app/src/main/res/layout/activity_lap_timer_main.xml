@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	android:id="@+id/activity_lap_timer_main"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:paddingBottom="@dimen/activity_vertical_margin"
+	android:paddingLeft="@dimen/activity_horizontal_margin"
+	android:paddingRight="@dimen/activity_horizontal_margin"
+	android:paddingTop="@dimen/activity_vertical_margin"
+	tools:context="laptimer.fpvtartu.eu.mocorp.fpvtartulaptimer.LapTimerMain">
+
+	<LinearLayout
+
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<Button
+			android:text="RESET DATA"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:id="@+id/bReset"/>
+
+		<Button
+			android:text="THRESHOLDING"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:id="@+id/bThresholding"/>
+	</LinearLayout>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Aircraft number:"/>
+	<LinearLayout
+
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<Button
+			android:text="Lower"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:id="@+id/bNrMinus"/>
+
+		<Button
+			android:text="Higher"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:id="@+id/bNrPlus"/>
+	</LinearLayout>
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Laps: ?"
+		android:id="@+id/tvNrOfLaps"/>
+	<ScrollView
+		android:layout_weight="1"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="No laps yet recorded"
+			android:id="@+id/tvLaptimes"/>
+	</ScrollView>
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Status text will be here"
+		android:id="@+id/tvStatus"/>
+
+	<EditText
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:inputType="textPersonName"
+		android:text="Lap time was % seconds"
+		android:ems="10"
+		android:id="@+id/etTest"/>
+
+</LinearLayout>
