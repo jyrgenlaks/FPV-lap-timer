@@ -28,7 +28,7 @@ public class TTSManager implements TextToSpeech.OnInitListener {
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e("TTS", "This Language is not supported");
             }else{
-                speak("This is a sentence");
+                speak("TTS is ready!");
             }
             //TODO check for errors and handle them correctly
         } else {

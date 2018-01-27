@@ -10,16 +10,22 @@ import java.util.List;
 public class LapLog {
 
 	private List<List<LapData>> lapLogs = new ArrayList<>();
+	private int correctedAircraftNumber, latestRawADC, latestThreshold;
+	private double newLapTime;
 
 	public LapLog() {
 
 	}
 
-	public void parse(String data){
+	public boolean parse(String data, int currentAircraft){
 		if(data == null)
-			return;
+			return false;
 
 		String rows[] = data.trim().split("&");
+		if(currentAircraft < -1) currentAircraft = rows.length-1;
+		if(currentAircraft > rows.length-1) currentAircraft = -1;
+
+		boolean isThereAnUpdateForTheCurrentAircraft = false;
 		for (int aircraftNumber = 0; aircraftNumber < rows.length; aircraftNumber++) {
 			String row = rows[aircraftNumber];
 			String fields[] = row.split("\\|");
@@ -30,38 +36,82 @@ public class LapLog {
 					int rawADC = Integer.parseInt(fields[2]);
 					int thresholdValue = Integer.parseInt(fields[3]);
 
-					while (lapLogs.size() <= aircraftNumber) {
-						lapLogs.add(new ArrayList<>());
+					if(currentAircraft == aircraftNumber){
+						latestRawADC = rawADC;
+						latestThreshold = thresholdValue;
 					}
-					List<LapData> lapData = lapLogs.get(aircraftNumber);
-					boolean isAnUpdate = true;
-					for (LapData d : lapData) {
-						if (d.getLapNumber() == lastLapNumber) {
-							isAnUpdate = false;
+
+					if(lastLapTime > 0) {
+						while (lapLogs.size() <= aircraftNumber) {
+							lapLogs.add(new ArrayList<>());
 						}
-					}
-					if (isAnUpdate) {
-						//a log with this lap number does not exist, creating it
-						lapLogs.get(aircraftNumber).add(new LapData(lastLapNumber, lastLapTime));
+						List<LapData> lapData = lapLogs.get(aircraftNumber);
+						boolean isAnUpdate = true;
+						for (LapData d : lapData) {
+							if (d.getLapNumber() == lastLapNumber) {
+								isAnUpdate = false;
+							}
+						}
+						if (isAnUpdate) {
+							//a log with this lap number does not exist, creating it
+							lapLogs.get(aircraftNumber).add(new LapData(lastLapNumber, lastLapTime));
+							if (currentAircraft == -1 || currentAircraft == aircraftNumber) {
+								//A new lap was recorded
+								newLapTime = Math.round(lastLapTime / 10.0) / 100.0;
+								isThereAnUpdateForTheCurrentAircraft = true;
+							}
+						}
 					}
 				}catch (NumberFormatException e){
 					e.printStackTrace();
 				}
 			}
 		}
+		correctedAircraftNumber = currentAircraft;
+		return isThereAnUpdateForTheCurrentAircraft;
 	}
 
-	public String getLogs(){
+	public void reset(){
+		lapLogs = new ArrayList<>();
+	}
+
+	public String getLogs(int aircraft){
 		StringBuilder s = new StringBuilder();
+		if(aircraft == -1) {
+			s.append("All quadcopters:\n");
+		}
 		for(int i = 0; i < lapLogs.size(); i++) {
 			List<LapData> list = lapLogs.get(i);
 
-			s.append("Quadcopter #" + i + "\n");
-			for(LapData data : list){
-				s.append("\t\tLap " + data.getLapNumber() + ": " + data.getLapTime()/1000.0 + " seconds\n");
+			if(aircraft == -1) {
+				s.append("\tQuadcopter #" + i + "\n");
+			}
+			if(aircraft == -1 || aircraft == i) {
+				for (LapData data : list) {
+					if (aircraft == -1) {
+						s.append("\t\t");
+					}
+					s.append("Lap " + data.getLapNumber() + ": " + data.getLapTime() / 1000.0 + " seconds\n");
+				}
 			}
 		}
 		return s.toString();
+	}
+
+	public int getCorrectedAircraftNumber() {
+		return correctedAircraftNumber;
+	}
+
+	public double getNewLapTime() {
+		return newLapTime;
+	}
+
+	public int getLatestRawADC() {
+		return latestRawADC;
+	}
+
+	public int getLatestThreshold(){
+		return latestThreshold;
 	}
 
 	public class LapData{
