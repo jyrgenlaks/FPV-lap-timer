@@ -10,10 +10,20 @@
 	android:paddingLeft="@dimen/activity_horizontal_margin"
 	android:paddingRight="@dimen/activity_horizontal_margin"
 	android:paddingTop="@dimen/activity_vertical_margin"
+	android:descendantFocusability="beforeDescendants"
+	android:focusableInTouchMode="true"
 	tools:context="laptimer.fpvtartu.eu.mocorp.fpvtartulaptimer.LapTimerMain">
 
-	<LinearLayout
+	<EditText
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:inputType="textPersonName"
+		android:text="Lap time was % seconds"
+		android:ems="10"
+		android:visibility="gone"
+		android:id="@+id/etSpeech"/>
 
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 		<Button
@@ -29,35 +39,21 @@
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:id="@+id/bThresholding"/>
-	</LinearLayout>
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="Aircraft number:"
-		android:id="@+id/tvAircraftNr"/>
-	<LinearLayout
 
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
 		<Button
-			android:text="Lower"
+			android:text="TTS"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
-			android:id="@+id/bNrMinus"/>
-
-		<Button
-			android:text="Higher"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:id="@+id/bNrPlus"/>
+			android:id="@+id/bToggleET"/>
 	</LinearLayout>
-	<TextView
+
+	<Button
+		android:text="No connection!"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="Laps: ?"
-		android:id="@+id/tvNrOfLaps"/>
+		android:id="@+id/bAircraftNumber"/>
+
 	<ScrollView
 		android:layout_weight="1"
 		android:layout_width="match_parent"
@@ -73,13 +69,4 @@
 		android:layout_height="wrap_content"
 		android:text="Status text will be here"
 		android:id="@+id/tvStatus"/>
-
-	<EditText
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:inputType="textPersonName"
-		android:text="Lap time was % seconds"
-		android:ems="10"
-		android:id="@+id/etSpeech"/>
-
 </LinearLayout>
