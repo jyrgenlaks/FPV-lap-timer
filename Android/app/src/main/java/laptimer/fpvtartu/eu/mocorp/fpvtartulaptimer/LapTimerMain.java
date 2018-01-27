@@ -13,6 +13,7 @@ public class LapTimerMain extends AppCompatActivity{
 
 	private ESPConnectionManager esp;
 	private boolean running = true;
+	private LapLog lapLog;
 
 	private Button bThresholding, bReset, bNrMinus, bNrPlus;
 	private TextView tvAircraftNumber, tvStatus, tvNrOfLaps, tvLapTimes;
@@ -28,6 +29,7 @@ public class LapTimerMain extends AppCompatActivity{
 
 		tts = new TTSManager(getApplicationContext());
 		esp = new ESPConnectionManager(getApplicationContext());
+		lapLog = new LapLog();
 
 		tvAircraftNumber = (TextView) findViewById(R.id.tvAircraftNr);
 		tvStatus= (TextView) findViewById(R.id.tvStatus);
@@ -79,6 +81,9 @@ public class LapTimerMain extends AppCompatActivity{
 			Log.d("LAPTIMER", "Polled data from ESP: " + data);
 
 			if(data != null) {
+				lapLog.parse(data);
+				runOnUiThread(() -> tvLapTimes.setText(lapLog.getLogs()));
+
 				String rows[] = data.split("&");
 				if(currentAircraft < 0) currentAircraft = rows.length-1;
 				if(currentAircraft > rows.length-1) currentAircraft = 0;
@@ -90,6 +95,7 @@ public class LapTimerMain extends AppCompatActivity{
 						runOnUiThread(() -> tvStatus.setText("Current aircraft data: \n" + row));
 					}
 				}
+
 			}else{
 				runOnUiThread(() -> tvStatus.setText("The returned data was null!"));
 			}
