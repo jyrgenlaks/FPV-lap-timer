@@ -1,7 +1,9 @@
 
+#include <EEPROM.h>
+
 const int nrOfChannels = 4;
-int minimum_lap_time = 2000;
-int threshold_hysterisis = 300;
+int minimum_lap_time = 4000;
+int threshold_hysterisis = 500;
 
 int rssis[nrOfChannels];  // analog RSSI reading buffer
 int states[nrOfChannels]; // bit1: 0 - no laps gone through, 1 - has entered a gate at least once
@@ -14,10 +16,14 @@ int max_values[nrOfChannels];       //maximum RSSI readings
 unsigned long lap_start_times[nrOfChannels];  //millis() of the last gate entering
 unsigned long max_times[nrOfChannels];        //millis() taken at the highest RSSI reading
 
+
 void setup() {
-  
+
   Serial.begin(115200);
   Serial3.begin(115200);
+  
+  initEEPROM();
+  
   resetAll(1);
   
 }
@@ -46,7 +52,9 @@ void resetAll(int all){
     rssis[i] = 0;
     if(all) {
       pinMode(i, INPUT_ANALOG);
-      thresholds[i] = 2000;
+      uint16_t th = getThreshold(i);
+      if(th == 65535) th = 2000;
+      thresholds[i] = th;
     }
     max_values[i] = 0;
     max_times[i] = 9000;
@@ -183,6 +191,7 @@ void handleInput(){
       Serial.print(newThreshold);
       Serial.print("!\n");*/
       thresholds[channel] = newThreshold;
+      saveThreshold(channel, newThreshold);
       
     }
   }
@@ -206,7 +215,7 @@ void handleInput(){
       if(buf[0] == 't'  &&  buf[1] == 'h'){
         if(pos == 2){
           channel = c - '0';
-        }else if(pos > 2  &&  c != '\n'){
+        }else if(pos > 2  &&  c >= '0'  &&  c <= '9'){
           //Serial.print("Adding ");
           //Serial.println((c - '0'));
           newThreshold *= 10;
@@ -232,13 +241,28 @@ void handleInput(){
       Serial.print(newThreshold);
       Serial.print("!\n");*/
       thresholds[channel] = newThreshold;
-      
+      saveThreshold(channel, newThreshold);
     }
   }
 }
 
+//EEPROM STUFF
+void initEEPROM(){
+  EEPROM.init();
+  EEPROM.PageBase0 = 0x801F000;
+  EEPROM.PageBase1 = 0x801F800;
+  EEPROM.PageSize  = 0x400;
+}
 
+void saveThreshold(uint8_t craft, uint16_t threshold){
+  EEPROM.write(0x10+craft, threshold);
+}
 
+uint16_t getThreshold(int craft){
+  uint16_t Data;
+  EEPROM.read(0x10+craft, &Data);
+  return Data;
+}
 
 
 
