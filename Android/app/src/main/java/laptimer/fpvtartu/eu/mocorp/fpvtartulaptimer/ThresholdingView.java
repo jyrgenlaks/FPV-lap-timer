@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -24,7 +26,7 @@ public class ThresholdingView extends DialogFragment{
 	private TextView tv;
 	private boolean running = true;
 
-	private int threshold = 1234, rawADC = 2345;
+	private int threshold, rawADC;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -36,17 +38,17 @@ public class ThresholdingView extends DialogFragment{
 		ll.setOrientation(LinearLayout.VERTICAL);
 
 		tv = new TextView(getActivity());
-		tv.setText("sth");
+		tv.setGravity(Gravity.CENTER_HORIZONTAL);
 
 		pb = new ProgressBar(getActivity(), null, android.R.attr.progressBarStyleHorizontal);
 		pb.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+		pb.setPadding(50, 50, 50, 50);
 		pb.setMax(4096);
-		pb.setProgress(threshold);
 
 		sb = new SeekBar(getActivity());
 		sb.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 		sb.setMax(4096);
-		//sb.setProgress(2345);
+		sb.setProgress(threshold);
 
 		ll.addView(tv);
 		ll.addView(pb);
