@@ -1,6 +1,8 @@
 # FPV-lap-timer
 Wireless lap timer software for FPV racing quads.
 
+Download the Android app [HERE](https://github.com/jyrgenlaks/FPV-lap-timer/blob/master/Android/app/release/Laptimer_v1.apk?raw=true)
+
 ## Structure
 * Android - contains the Android client application
   * Speaks out the lap times
