@@ -1,5 +1,7 @@
 package laptimer.fpvtartu.eu.mocorp.fpvtartulaptimer;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +19,24 @@ public class LapLog {
 
 	}
 
-	public boolean parse(String data, int currentAircraft){
-		if(data == null)
+	private boolean isDataCorrect(String data){
+		String rows[] = data.trim().split("&");
+		if(rows.length != 4){
 			return false;
+		}
+		for(String row : rows) {
+			if(row.split("\\|").length != 4){
+				Log.d("LAPTIMER", "DETECTED INVALID DATA!!!");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean parse(String data, int currentAircraft){
+		if(data == null  ||  !isDataCorrect(data)) {
+			return false;
+		}
 
 		String rows[] = data.trim().split("&");
 		if(currentAircraft < -1) currentAircraft = rows.length-1;

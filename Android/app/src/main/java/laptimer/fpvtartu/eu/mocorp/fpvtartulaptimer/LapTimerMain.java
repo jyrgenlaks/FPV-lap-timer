@@ -1,25 +1,19 @@
 package laptimer.fpvtartu.eu.mocorp.fpvtartulaptimer;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class LapTimerMain extends AppCompatActivity{
@@ -28,8 +22,8 @@ public class LapTimerMain extends AppCompatActivity{
 	private boolean running = true;
 	private LapLog lapLog;
 
-	private Button bThresholding, bReset, bNrMinus, bNrPlus;
-	private TextView tvAircraftNumber, tvStatus, tvNrOfLaps, tvLapTimes;
+	private Button bThresholding, bToggleET, bReset, bAircraftNumber;
+	private TextView tvStatus, tvLapTimes;
 	private EditText etSpeech;
 
 	private TTSManager tts;
@@ -55,25 +49,33 @@ public class LapTimerMain extends AppCompatActivity{
 		esp = new ESPConnectionManager(getApplicationContext());
 		lapLog = new LapLog();
 
-		tvAircraftNumber = (TextView) findViewById(R.id.tvAircraftNr);
 		tvStatus= (TextView) findViewById(R.id.tvStatus);
-		tvNrOfLaps = (TextView) findViewById(R.id.tvNrOfLaps);
 		tvLapTimes = (TextView) findViewById(R.id.tvLaptimes);
 
 		etSpeech = (EditText) findViewById(R.id.etSpeech);
 
-		bNrMinus = (Button) findViewById(R.id.bNrMinus);
-		bNrPlus = (Button) findViewById(R.id.bNrPlus);
+		bAircraftNumber = (Button) findViewById(R.id.bAircraftNumber);
+		bToggleET = (Button) findViewById(R.id.bToggleET);
 		bReset = (Button) findViewById(R.id.bReset);
 		bThresholding = (Button) findViewById(R.id.bThresholding);
 
-		bNrMinus.setOnClickListener((v) -> currentAircraft--);
-		bNrPlus.setOnClickListener((v) -> currentAircraft++);
+		bAircraftNumber.setOnClickListener((v) -> {
+			currentAircraft++;
+			bAircraftNumber.setEnabled(false);
+		});
 
 		bReset.setOnClickListener(v -> {
 			bReset.setEnabled(false);
 			shouldReset = true;
         });
+
+		bToggleET.setOnClickListener(v -> {
+			if(etSpeech.getVisibility() == View.GONE){
+				etSpeech.setVisibility(View.VISIBLE);
+			}else{
+				etSpeech.setVisibility(View.GONE);
+			}
+		});
 
 		bThresholding.setOnClickListener(v -> {
             //esp.setThreshold(2, 1234);
@@ -90,12 +92,12 @@ public class LapTimerMain extends AppCompatActivity{
 				while(running){
 					try {
 						mainLoop();
-						sleep(100);
+						sleep(300);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-
 				}
+				runOnUiThread(() -> tvStatus.setText("Main loop has finished @" + System.currentTimeMillis()));
 			}
 		}.start();
 	}
@@ -109,9 +111,10 @@ public class LapTimerMain extends AppCompatActivity{
 			Thread.sleep(3000);
 		}else{
 			if(shouldReset){
+				shouldReset = false;
 				esp.resetCounters();
 				lapLog.reset();
-				shouldReset = false;
+				Thread.sleep(1000);
 				runOnUiThread(() -> bReset.setEnabled(true));
 			}
 			if(shouldThreshold){
@@ -121,7 +124,7 @@ public class LapTimerMain extends AppCompatActivity{
 			}
 
 			String data = esp.pollData();
-			//Log.d("LAPTIMER", "Polled data from ESP: " + data);
+			Log.d("LAPTIMER", "Polled data from ESP: " + data);
 
 			if(data != null) {
 				boolean lapFinished = lapLog.parse(data, currentAircraft);
@@ -129,7 +132,8 @@ public class LapTimerMain extends AppCompatActivity{
 				thresholdingView.setRaw(lapLog.getLatestRawADC());
 
 				runOnUiThread(() -> tvLapTimes.setText(lapLog.getLogs(currentAircraft)));
-				runOnUiThread(() -> tvAircraftNumber.setText("Current aircraft: " + (currentAircraft==-1?"ALL":currentAircraft)));
+				runOnUiThread(() -> bAircraftNumber.setText("Current aircraft: " + (currentAircraft==-1?"ALL":currentAircraft)));
+				runOnUiThread(() -> bAircraftNumber.setEnabled(true));
 
 				if(lapFinished){
 					tts.speak(etSpeech.getText().toString().replace("%", ""+lapLog.getNewLapTime()));
@@ -184,7 +188,6 @@ public class LapTimerMain extends AppCompatActivity{
 					bThresholding.setEnabled(false);
 					String state = extras.getString(TelephonyManager.EXTRA_STATE);
 					newThreshold = extras.getInt("THRESHOLD");
-					Log.d("LAPTIMER", "Threshold val: " + newThreshold);
 					shouldThreshold = true;
 				}
 			}

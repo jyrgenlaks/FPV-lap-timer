@@ -48,13 +48,17 @@ public class ESPConnectionManager {
                     break;
                 }
             }
-            while(!isConnectedToWifi()){
-                try {
+            long start = System.currentTimeMillis();
+            Log.d("LAPTIMER-WIFI", "Entering connecting loop");
+            while(!isConnectedToWifi() && System.currentTimeMillis() - start < 10000){
+				Log.d("LAPTIMER-WIFI", "INSIDE connecting loop");
+            	try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+			Log.d("LAPTIMER-WIFI", "Exited the connecting loop");
         }else{
             Log.e("LAPTIMER", "Error: connectToWifi: WifiManager is null");
         }
